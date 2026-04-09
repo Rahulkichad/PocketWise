@@ -1,0 +1,65 @@
+# PocketWise Infrastructure Configuration (Render.com)
+services:
+  # 1. Frontend: Static Site (Fast & Free)
+  - type: static
+    name: pocketwise-frontend
+    repo: https://github.com/Rahulkichad/PocketWise.git # This will be automatically updated by Render
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: pocketwise-backend
+          property: host
+        sync: false
+
+  # 2. Backend: Node.js/Express API (Free Tier Web Service)
+  - type: web
+    name: pocketwise-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: Dockerfile.prod
+    plan: free # Free instance with 512MB RAM
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
+      - key: MONGO_URI
+        sync: false # User must provide MongoDB Atlas URI here
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ML_SERVICE_URL
+        fromService:
+          type: web
+          name: pocketwise-ml
+          property: host
+      - key: CORS_ORIGIN
+        fromService:
+          type: static
+          name: pocketwise-frontend
+          property: host
+
+  # 3. ML Service: Python/FastAPI (Free Tier Web Service)
+  - type: web
+    name: pocketwise-ml
+    runtime: docker
+    dockerContext: ./ml
+    dockerfilePath: Dockerfile.prod
+    plan: free # Free instance with 512MB RAM
+    envVars:
+      - key: PORT
+        value: 8001
+      - key: MONGO_URI
+        sync: false # User must provide MongoDB Atlas URI here
+      - key: ALLOWED_ORIGINS
+        fromService:
+          type: web
+          name: pocketwise-backend
+          property: host
+      # RECOMMENDATION: Replace OLLAMA_URL with a free external API for production
+      # - key: OLLAMA_URL
+      #   value: http://localhost:11434 (Won't work on free tier)
+      # - key: GOOGLE_API_KEY
+      #   sync: false # Provide Gemini API key for AI features

@@ -1,0 +1,32 @@
+# PocketWise Backend Dockerfile - Production Build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files and install ALL dependencies for building
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy source files
+COPY src ./src
+
+# --- Production Stage ---
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+
+# Copy package files and install ONLY production dependencies
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev
+
+# Copy source files from builder stage
+COPY --from=builder /app/src ./src
+
+# Expose backend port
+EXPOSE 8000
+
+# Start production server
+CMD ["npm", "start"]

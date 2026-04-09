@@ -1,0 +1,27 @@
+# PocketWise Frontend Dockerfile - Production Build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy source files
+COPY . .
+
+# Build production static files
+RUN npm run build
+
+# --- Production Stage ---
+# Use a lightweight Nginx image to serve static files
+FROM nginx:alpine
+
+# Copy built static files from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Expose Nginx port
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
