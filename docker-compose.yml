@@ -1,0 +1,84 @@
+services:
+  mongodb:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - pocketwise-network
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PORT=8000
+      - MONGO_URI=mongodb://mongodb:27017/pocketwise
+      - JWT_SECRET=dev_secret_change_me
+      - ML_SERVICE_URL=http://ml:8001
+      - CORS_ORIGIN=http://localhost:5173,http://frontend:5173
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./backend/src:/app/src
+    depends_on:
+      - mongodb
+      - ml
+    networks:
+      - pocketwise-network
+
+  ml:
+    build: ./ml
+    restart: unless-stopped
+    environment:
+      - PORT=8001
+      - INFLATION_RATE=0.06
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8000,http://frontend:5173,http://backend:8000
+      - MONGO_URI=mongodb://mongodb:27017/pocketwise
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3
+      - TIMEZONE=Asia/Kolkata
+    ports:
+      - '8001:8001'
+    volumes:
+      - ./ml/main.py:/app/main.py
+    networks:
+      - pocketwise-network
+  
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - pocketwise-network
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.js:/app/vite.config.js
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/postcss.config.js:/app/postcss.config.js
+    depends_on:
+      - backend
+    networks:
+      - pocketwise-network
+
+volumes:
+  mongo-data:
+  ollama-data:
+
+networks:
+  pocketwise-network:
+    driver: bridge

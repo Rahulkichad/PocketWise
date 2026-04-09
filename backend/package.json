@@ -1,0 +1,27 @@
+{
+  "name": "pocketwise-backend",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/seed/seed_rahul_test.js",
+    "seed:reset": "node src/seed/reset_and_seed.js",
+    "format": "prettier --write \"src/**/*.js\""
+  },
+  "dependencies": {
+    "axios": "1.6.8",
+    "bcryptjs": "2.4.3",
+    "cors": "2.8.5",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "jsonwebtoken": "9.0.2",
+    "mongoose": "7.6.1",
+    "morgan": "1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "3.0.2",
+    "prettier": "3.2.5"
+  }
+}

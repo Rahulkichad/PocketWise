@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg-app: #f6f7fb;
+  --bg-card: #ffffff;
+  --primary: #2563eb; /* PocketWise blue */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --text-primary: #0f172a; /* slate-900 */
+  --text-muted: #64748b;   /* slate-500 */
+}
+
+@layer base {
+  body { @apply bg-app text-ink antialiased; }
+}
+
+@layer components {
+  .pw-card { @apply bg-card rounded-2xl shadow-sm-soft border border-slate-100; }
+  .pw-card-hover { @apply transition-transform duration-200 ease-emphasized hover:-translate-y-0.5 hover:shadow-md-soft; }
+  .pw-btn { @apply inline-flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ease-emphasized; }
+  .pw-btn-primary { @apply bg-primary text-white shadow-sm hover:brightness-110 active:scale-95; }
+  .pw-btn-ghost { @apply bg-white/60 hover:bg-white text-ink border border-slate-200; }
+  .pw-skeleton { @apply animate-pulse bg-slate-200/70 rounded; }
+  .pw-number { font-variant-numeric: tabular-nums; }
+  .pw-h1 { @apply text-2xl md:text-3xl font-bold text-ink; }
+  .pw-h2 { @apply text-xl md:text-2xl font-semibold text-ink; }
+  .pw-label { @apply text-xs uppercase tracking-wide text-muted; }
+}
+
+/* Gradients */
+.pw-nav-gradient { background-image: linear-gradient(180deg, rgba(15,23,42,0.02) 0%, rgba(15,23,42,0.00) 100%); }
+.pw-header-gradient { background-image: linear-gradient(180deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0) 100%); }
