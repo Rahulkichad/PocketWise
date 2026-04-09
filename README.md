@@ -213,3 +213,4 @@ docker compose up --build
   - Backend API: http://localhost:8000/api/v1
   - ML Service: http://localhost:8001
   - Ollama: http://localhost:11434
+```
